@@ -1,0 +1,94 @@
+@startuml
+!theme plain
+hide circle
+skinparam linetype ortho
+
+enum "WasteType" as wasteType {
+  VEGETABLES
+  DAIRY
+  GRAINS
+  MEAT
+  OTHER
+}
+
+entity "User" as user {
+  * id : Long <<PK>>
+  --
+  * username : String
+  * password : String
+}
+
+entity "Address" as address {
+  * id : Long <<PK>>
+  --
+  * streetName : String
+  * buildingNumber : String
+  * city : String
+  * postalCode : String
+  * country : String
+}
+
+entity "Location" as location {
+  * id : Long <<PK>>
+  --
+  * latitude : Double
+  * longitude : Double
+  * description : String
+}
+
+entity "FoodDonor" as donor {
+  * id : Long <<PK>>
+  --
+  * name : String
+  * contactInfo : String
+  --
+  address_id : Long <<FK>>
+}
+
+entity "FoodWasteItem" as waste {
+  * id : Long <<PK>>
+  --
+  * weight : Double
+  * expirationDate : Date
+  * type : WasteType
+  * isProcessed : Boolean
+  --
+  donor_id : Long <<FK>>
+  processor_id : Long <<FK>>
+}
+
+entity "CollectionCenter" as center {
+  * id : Long <<PK>>
+  --
+  * maxCapacity : Double
+  --
+  location_id : Long <<FK>>
+  processor_id : Long <<FK>>
+}
+
+entity "Processor" as processor {
+  * id : Long <<PK>>
+  --
+  * name : String
+  * maxCapacity : Double
+  --
+  location_id : Long <<FK>>
+}
+
+entity "donor_collection_center" as donor_center {
+  * donor_id : Long <<FK>>
+  * center_id : Long <<FK>>
+}
+
+address ||..o{ donor : "located at"
+location ||..o{ center : "positioned at"
+location ||..o{ processor : "positioned at"
+
+donor ||..o{ waste : "provides"
+processor ||..o{ waste : "processes"
+processor ||..o{ center : "collects from"
+
+donor ||..o{ donor_center : "has"
+center ||..o{ donor_center : "has"
+
+@enduml
